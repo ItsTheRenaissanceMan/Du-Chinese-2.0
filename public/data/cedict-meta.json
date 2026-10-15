@@ -1,0 +1,14 @@
+{
+  "name": "CC-CEDICT",
+  "contributors": "CC-CEDICT contributors; JSON distribution by Matt Tingen",
+  "source": "https://www.mdbg.net/chinese/dictionary?page=cc-cedict",
+  "distribution": "cedict-json@1.3.20251213",
+  "repository": "https://github.com/matt-tingen/cedict-json",
+  "license": "CC-BY-SA-4.0",
+  "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "entryCount": 124188,
+  "simplifiedHeadwordCount": 120448,
+  "sourceSha256": "dc89df06ab949a7da7d61de3531ebfa80366b02255e42ab04c1039de08ed6d08",
+  "modifications": "Renamed english to definitions, converted numeric pinyin to tone marks, added original approximate reading-difficulty bands. No dictionary definitions removed.",
+  "difficultyDisclaimer": "Reading bands are estimates, not official HSK classifications or validated assessment scores."
+}

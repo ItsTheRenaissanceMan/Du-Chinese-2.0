@@ -1,0 +1,15 @@
+# Start Hanlin in the cloud development environment
+
+Use the existing checkout at `/workspace/Du-Chinese-2.0`. Cloud tasks are already isolated; do not create a Git worktree unless the user explicitly asks for one.
+
+Installed dependencies, the prepared dictionary, native binaries, and verified speech models are retained files. Servers, Electron windows, and X displays are processes and must be started again in a new task.
+
+1. Work in `/workspace/Du-Chinese-2.0`, with Node.js 24. If dependencies or prepared assets are missing, run `bash scripts/cloud-install.sh`. Keep the lockfile, source, and tests unchanged during setup. Do not regenerate story source as an installation step.
+2. Start browser development with `npm run dev` in a managed background terminal, logging to `/tmp/hanlin-vite.log` if necessary. The server binds to loopback port 5173. Verify its HTML response and `/data/cedict.json` returning 124,188 dictionary entries. Use Playwright for UI validation; do not present loopback preview links to the user.
+3. Run `npm run typecheck`, `npm test`, and `npm run test:e2e` for development checks. Run the browser suite in one process so its traces and server lifecycle are not shared with another Playwright run.
+4. For desktop development, use `npm run desktop:dev` on a working display. The launcher starts Vite, waits for HTML, opens Electron, and cleans up its processes on exit. Do not run this launcher while another server already owns its selected port; stop only a server you started or choose `HANLIN_DEV_PORT`.
+5. This cloud image includes Xorg and a configured dummy driver. If no display is available, first check `DISPLAY=:98 xdpyinfo`. If it is unavailable, start `Xorg :98 -noreset -nolisten tcp -logfile /tmp/hanlin-xorg.log` in a managed background terminal, then use `DISPLAY=:98`. Reuse an existing display rather than stopping another task's process. Do not disable Electron's sandbox.
+6. For production desktop validation, run `npm run build`, then `DISPLAY=:98 npm run test:desktop`. This tests the real sandboxed Electron window, bundled dictionary, Mandarin audio recognition, microphone worklet, bundled narration, and cleanup. On a desktop with a regular display, use its existing `DISPLAY` instead. Actual speakers and a physical microphone still need a hardware check.
+7. Build the Windows portable executable with `XDG_CACHE_HOME=/workspace/.cache NODE_USE_ENV_PROXY=1 ELECTRON_BUILDER_CACHE=/workspace/.cache/electron-builder npm run package:win`. The command prepares verified models and Windows native libraries and includes them in the package. The Linux cloud can inspect that artifact, but cannot establish physical Windows runtime behavior.
+
+No API keys or external speech services are needed for the desktop app. Preserve injected HTTPS proxy settings and CA trust during downloads; never disable TLS or checksum verification. Browser speech recognition can use its provider and states that limitation. The original uploaded executable was too large to inspect; the saved project is an independent replacement implementation.

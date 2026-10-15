@@ -1,0 +1,91 @@
+name: Validate and build Hanlin
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: hanlin-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows-portable:
+    name: Test and package Windows x64
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - name: Set up Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: package-lock.json
+
+      - name: Install locked dependencies and Electron
+        run: |
+          npm ci
+          npm run install:electron
+
+      - name: Prepare dictionary and verified offline speech assets
+        run: |
+          npm run prepare:data
+          npm run prepare:speech
+          npm run prepare:tts
+          npm run prepare:windows-speech
+
+      - name: Build application and run unit and native speech tests
+        run: |
+          npm run build
+          npm test
+
+      - name: Install the matching Playwright Chromium
+        run: |
+          npx playwright install --with-deps chromium
+          node --input-type=module <<'NODE'
+          import { appendFileSync } from 'node:fs';
+          import { chromium } from '@playwright/test';
+          appendFileSync(process.env.GITHUB_ENV, `PLAYWRIGHT_CHROMIUM_PATH=${chromium.executablePath()}\n`);
+          NODE
+
+      - name: Test browser workflows
+        run: npm run test:e2e
+
+      - name: Preserve browser failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: playwright-diagnostics
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Build Windows portable and editable source archives
+        run: |
+          npm run package:win
+          python3 scripts/package-source.py
+          sha256sum release/Hanlin-*-windows-x64-portable.exe release/Hanlin-*-source.zip > release/SHA256SUMS.txt
+
+      - name: Upload Windows portable and source artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: Hanlin-windows-x64
+          path: |
+            release/Hanlin-*-windows-x64-portable.exe
+            release/Hanlin-*-source.zip
+            release/SHA256SUMS.txt
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 14
