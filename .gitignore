@@ -1,7 +1,11 @@
 node_modules/
 .npm-cache/
 dist/
-release/
+/release/*
+!/release/README.md
+!/release/Hanlin-2.1.0-windows-x64-portable.exe
+!/release/Hanlin-2.1.0-source.zip
+!/release/SHA256SUMS.txt
 playwright-report/
 test-results/
 public/data/cedict.json

@@ -8,9 +8,10 @@ version = json.loads((root / "package.json").read_text(encoding="utf-8"))["versi
 target = root / "release" / f"Hanlin-{version}-source.zip"
 target.parent.mkdir(exist_ok=True)
 files = {
-    ".gitignore", ".npmrc", ".nvmrc", "LICENSE", "README.md", "index.html",
+    ".gitattributes", ".gitignore", ".npmrc", ".nvmrc", "LICENSE", "README.md", "index.html",
     "package.json", "package-lock.json", "tsconfig.json", "vite.config.ts",
     "vitest.config.ts", "playwright.config.ts", "resources/icon.png", "resources/icon.ico",
+    "release/README.md",
 }
 for directory in (".github", "src", "electron", "scripts", "tests", "docs", "public"):
     for item in (root / directory).rglob("*"):

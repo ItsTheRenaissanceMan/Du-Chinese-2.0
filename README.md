@@ -4,6 +4,8 @@ An independent Windows desktop Chinese reader with an offline dictionary, origin
 
 ## Use the desktop app
 
+Download the [Windows portable app](release/Hanlin-2.1.0-windows-x64-portable.exe) or [editable source ZIP](release/Hanlin-2.1.0-source.zip) from the checked-in [release folder](release/README.md). The executable uses Git LFS because it exceeds GitHub's normal file limit. On its GitHub file page, choose **Download raw file**. For a Git clone, install Git LFS and run `git lfs pull` to retrieve the executable. The [SHA-256 checksums](release/SHA256SUMS.txt) verify both downloads.
+
 Open `release/Hanlin-2.1.0-windows-x64-portable.exe` on Windows 10 or later (64 bit). The portable launcher extracts its application to a temporary directory when opened. It needs no Node installation or development server. Progress is stored in Electron's persistent per-user application data, not in the temporary extraction directory. Export progress from Settings before moving to another computer or reinstalling your operating system.
 
 The reader lets you:
